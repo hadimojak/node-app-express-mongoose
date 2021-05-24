@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
-
 const User = require("../models/user");
+const nodemailer = require("nodemailer");
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
