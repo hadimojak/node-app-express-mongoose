@@ -67,6 +67,7 @@ app.use(errorController.get404);
 mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
+    console.log("connected");
     app.listen(3000);
   })
   .catch((err) => {
