@@ -29,7 +29,7 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
-  let message = req.flash("error");
+  let message = req.flash("error"); // this is useless but i keep this for refrence
   if (message.length > 0) {
     message = message[0];
   } else {
@@ -110,9 +110,6 @@ exports.postSignup = (req, res, next) => {
   const password = req.body.password;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    // console.log(errors.array());
-    // const [ msg ] = errors.array();
-    // console.log(msg.msg);
     return res.status(422).render("auth/signup", {
       path: "/signup",
       pageTitle: "Signup",
