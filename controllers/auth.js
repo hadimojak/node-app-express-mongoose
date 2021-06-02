@@ -82,7 +82,7 @@ exports.postLogin = (req, res, next) => {
             req.session.isLoggedIn = true;
             req.session.user = user;
             return req.session.save((err) => {
-              console.log("post login", err);
+              console.log("post login", err ? err : "");
               res.redirect("/");
             });
           }
@@ -102,7 +102,11 @@ exports.postLogin = (req, res, next) => {
           res.redirect("/login");
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postSignup = (req, res, next) => {
@@ -143,13 +147,15 @@ exports.postSignup = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    console.log("post logout", err);
+    console.log("post logout", err ? err : "");
     res.redirect("/");
   });
 };
@@ -197,7 +203,11 @@ exports.postReset = (req, res, next) => {
                 <p>Click this <a href="http://localhost:3000/reset/${token}">link</a>  to set a new password.</p>`,
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
 };
 
@@ -224,7 +234,9 @@ exports.getNewPassword = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -260,6 +272,8 @@ exports.postNewPassword = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
