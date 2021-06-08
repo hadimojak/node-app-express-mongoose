@@ -169,10 +169,37 @@ exports.getInvoice = (req, res, next) => {
         "Content-Disposition",
         "inline; filename='" + invoiceName + "'"
       );
+      const fontDBCartoonShout = fs.readFileSync(
+        path.resolve(__dirname, "../fonts/Nawal_MRT.ttf")
+      );
+      pdfDoc.registerFont("Nawal_MRT", fontDBCartoonShout);
+
       pdfDoc.pipe(fs.createWriteStream(invoicePath));
       pdfDoc.pipe(res);
 
-      pdfDoc.text("hwllowe world");
+      pdfDoc.fontSize(26).font('Nawal_MRT').text("فاکتور", {
+        underline: true,
+      });
+      pdfDoc.text("----------------------------");
+      let totalPrice = 0;
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price;
+        pdfDoc
+          .fontSize(14)
+          .text(
+            prod.product.title +
+              "(" +
+              prod.quantity +
+              ")" +
+              " " +
+              "x" +
+              " " +
+              "$" +
+              prod.product.price
+          );
+      });
+      pdfDoc.font('Nawal_MRT').text("----------------------------");
+      pdfDoc.fontSize(18).font('Nawal_MRT').text("Total price: $ " + totalPrice);
       pdfDoc.end(); // we r done writing in the pdf file
 
       // fs.readFile(invoicePath, (err, data) => {
@@ -191,7 +218,7 @@ exports.getInvoice = (req, res, next) => {
       // file.pipe(res);
     })
     .catch((err) => {
-      console.log(err)
+      console.log(err);
       return next(err);
     });
 };
