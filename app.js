@@ -16,7 +16,8 @@ const MONGODB_URI =
   "mongodb+srv://mojak:0015166031@nodejs-store.tbcbg.mongodb.net/shop?retryWrites=true&w=majority";
 
 const app = express();
-
+const shopController = require("./controllers/shop");
+const isAuth = require("./middleware/is-auth");
 const csrfProtection = csrf();
 
 const fileStorage = multer.diskStorage({
@@ -65,8 +66,8 @@ app.use(
     }),
   })
 );
-app.use(csrfProtection);
 app.use(flash());
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
@@ -103,6 +104,7 @@ app.use(errorController.get404);
 app.use((error, req, res, next) => {
   // res.status(error.httpStatusCode).render(...);
   // res.redirect('/500');
+  console.log(error);
   res.status(500).render("500", {
     pageTitle: "Error!",
     path: "/500",

@@ -4,6 +4,15 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const ITEMS_PER_PAGE = 2;
+const stripe = require("stripe")(
+  "pk_test_51J1U1pGOC6u4RDJJJCB4dvvGQAwbsyXjs2Ejy97INeG2xDkxXlIlrD3lUvD9lq12LrQxxRpjdrh5gY4TF0arrWUr00ZCvCuABI"
+);
+const ZarinpalCheckout = require("zarinpal-checkout");
+const { resolveHostname } = require("nodemailer/lib/shared");
+const zarinpal = ZarinpalCheckout.create(
+  "6TKMCOWP-UNHN-IOWR-HPL8-HBMFOLRVLKBP",
+  true
+);
 
 exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
@@ -137,10 +146,17 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
+  const token = req.body.stripeToken;
+  let totalSum = 0;
+
   req.user
     .populate("cart.items.productId")
     .execPopulate()
     .then((user) => {
+      user.cart.items.forEach((p) => {
+        totalSum += p.quantity * p.productId.price;
+      });
+
       const products = user.cart.items.map((i) => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
@@ -151,13 +167,27 @@ exports.postOrder = (req, res, next) => {
         },
         products: products,
       });
-      return order.save();
+      req.order = order;
     })
     .then((result) => {
-      return req.user.clearCart();
+      return zarinpal.PaymentRequest({
+        Amount: req.body.amount,
+        CallbackURL: "http://localhost:3000/payCheck",
+        Description: "عملیات پرداخت",
+        Email: req.user.email,
+        Mobile: "09120000000",
+      });
     })
-    .then(() => {
-      res.redirect("/orders");
+    .then((response) => {
+      if (response.status == 100) {
+        req.order.save();
+        // console.log(req.order);
+        return res.redirect(response.url);
+      }
+    })
+    .then((result) => {
+      req.user.clearCart();
+      // res.setHeaders("csrf-token", csrf);
     })
     .catch((err) => {
       const error = new Error(err);
@@ -171,7 +201,7 @@ exports.getOrders = (req, res, next) => {
     .then((orders) => {
       res.render("shop/orders", {
         path: "/orders",
-        pageTitle: "Your Orders",
+        pageTitle: "سفارشات",
         orders: orders,
       });
     })
@@ -256,4 +286,33 @@ exports.getInvoice = (req, res, next) => {
       console.log(err);
       return next(err);
     });
+};
+
+exports.getCheckout = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items;
+      let total = 0;
+      products.forEach((p) => {
+        total += p.quantity * p.productId.price;
+      });
+      res.render("shop/checkout", {
+        path: "/checkout",
+        pageTitle: "Checkout",
+        products: products,
+        totalSum: total,
+      });
+    });
+};
+
+exports.payCheck = (req, res, next) => {
+  // console.log(req.query.Authority);
+  let paymentStatus = req.query.Status.toString();
+  res.render("shop/payCheck", {
+    pageTitle: "payCheck",
+    path: "/payCheck",
+    paymentStatus: paymentStatus == "OK" ? true : false,
+  });
 };
