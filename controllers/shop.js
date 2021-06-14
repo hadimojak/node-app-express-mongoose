@@ -8,7 +8,7 @@ const stripe = require("stripe")(
   "pk_test_51J1U1pGOC6u4RDJJJCB4dvvGQAwbsyXjs2Ejy97INeG2xDkxXlIlrD3lUvD9lq12LrQxxRpjdrh5gY4TF0arrWUr00ZCvCuABI"
 );
 const ZarinpalCheckout = require("zarinpal-checkout");
-const { resolveHostname } = require("nodemailer/lib/shared");
+const user = require("../models/user");
 const zarinpal = ZarinpalCheckout.create(
   "6TKMCOWP-UNHN-IOWR-HPL8-HBMFOLRVLKBP",
   true
@@ -147,16 +147,11 @@ exports.postCartDeleteProduct = (req, res, next) => {
 
 exports.postOrder = (req, res, next) => {
   const token = req.body.stripeToken;
-  let totalSum = 0;
 
   req.user
     .populate("cart.items.productId")
     .execPopulate()
     .then((user) => {
-      user.cart.items.forEach((p) => {
-        totalSum += p.quantity * p.productId.price;
-      });
-
       const products = user.cart.items.map((i) => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
@@ -180,15 +175,13 @@ exports.postOrder = (req, res, next) => {
     })
     .then((response) => {
       if (response.status == 100) {
-        req.order.save();
-        // console.log(req.order);
+        // req.order.save();
         return res.redirect(response.url);
       }
     })
-    .then((result) => {
-      req.user.clearCart();
-      // res.setHeaders("csrf-token", csrf);
-    })
+    // .then((result) => {
+    //   req.user.clearCart();
+    // })
     .catch((err) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
@@ -308,8 +301,32 @@ exports.getCheckout = (req, res, next) => {
 };
 
 exports.payCheck = (req, res, next) => {
-  // console.log(req.query.Authority);
-  let paymentStatus = req.query.Status.toString();
+  const paymentStatus = req.query.Status.toString();
+  if (paymentStatus == "OK") {
+    req.user
+      .populate("cart.items.productId")
+      .execPopulate()
+      .then((user) => {
+        const products = user.cart.items.map((i) => {
+          return { quantity: i.quantity, product: { ...i.productId._doc } };
+        });
+        const order = new Order({
+          user: {
+            email: req.user.email,
+            userId: req.user,
+          },
+          products: products,
+        });
+        order.save();
+
+        req.user.clearCart();
+      })
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
+  }
   res.render("shop/payCheck", {
     pageTitle: "payCheck",
     path: "/payCheck",

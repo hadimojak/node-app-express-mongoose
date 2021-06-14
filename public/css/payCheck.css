@@ -9,11 +9,13 @@ h1 {
   border-radius: 3px;
   font-size: large;
 }
+
 p {
   font: inherit;
   color: #00695c;
   font-size: xx-large;
 }
+
 a {
   display: inline-block;
   padding: 0.25rem 1rem;
@@ -26,8 +28,19 @@ a {
   cursor: pointer;
   font-size: medium;
 }
+
 a:hover,
 a:active {
   background-color: #00695c;
   color: white;
+}
+
+.main-header__item a,
+.main-header__item button {
+    padding: 0;
+}
+
+.mobile-nav__item a,
+.mobile-nav__item button {
+    padding: 0;
 }
