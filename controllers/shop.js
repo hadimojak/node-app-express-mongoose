@@ -4,11 +4,10 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const ITEMS_PER_PAGE = 2;
-const stripe = require("stripe")(
-  "pk_test_51J1U1pGOC6u4RDJJJCB4dvvGQAwbsyXjs2Ejy97INeG2xDkxXlIlrD3lUvD9lq12LrQxxRpjdrh5gY4TF0arrWUr00ZCvCuABI"
-);
+// const stripe = require("stripe")(
+//   "pk_test_51J1U1pGOC6u4RDJJJCB4dvvGQAwbsyXjs2Ejy97INeG2xDkxXlIlrD3lUvD9lq12LrQxxRpjdrh5gY4TF0arrWUr00ZCvCuABI"
+// );
 const ZarinpalCheckout = require("zarinpal-checkout");
-const user = require("../models/user");
 const zarinpal = ZarinpalCheckout.create(
   "6TKMCOWP-UNHN-IOWR-HPL8-HBMFOLRVLKBP",
   true
