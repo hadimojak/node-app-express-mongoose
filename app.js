@@ -1,7 +1,6 @@
 const path = require("path");
 
 const express = require("express");
-const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -16,8 +15,6 @@ const MONGODB_URI =
   "mongodb+srv://mojak:0015166031@nodejs-store.tbcbg.mongodb.net/shop?retryWrites=true&w=majority";
 
 const app = express();
-const shopController = require("./controllers/shop");
-const isAuth = require("./middleware/is-auth");
 const csrfProtection = csrf();
 
 const fileStorage = multer.diskStorage({
@@ -72,13 +69,11 @@ app.use(csrfProtection);
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.csrfToken = req.csrfToken();
-
   if (!req.session.user) {
     res.locals.isAdmin = false;
     return next();
   }
   res.locals.isAdmin = req.session.user.isAdmin;
-  // console.log(res.session.user);
   next();
 });
 
