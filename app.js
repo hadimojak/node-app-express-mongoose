@@ -72,6 +72,13 @@ app.use(csrfProtection);
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.csrfToken = req.csrfToken();
+
+  if (!req.session.user) {
+    res.locals.isAdmin = false;
+    return next();
+  }
+  res.locals.isAdmin = req.session.user.isAdmin;
+  // console.log(res.session.user);
   next();
 });
 
@@ -109,6 +116,7 @@ app.use((error, req, res, next) => {
     pageTitle: "Error!",
     path: "/500",
     isAuthenticated: req.session.isLoggedIn,
+    isAdmin: req.session.isAdmin,
   });
 });
 
