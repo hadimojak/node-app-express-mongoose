@@ -1,0 +1,8 @@
+{
+    "env": {
+        "MONGO_USER": "mojak",
+        "MONGO_PASSWORD": "0015166031",
+        "MONGO_DEFAULT_DATABASE": "shop",
+        "ZARINPAL_KEY": "6TKMCOWP-UNHN-IOWR-HPL8HPL8-HBMFOLRVLKBP"
+    }
+}

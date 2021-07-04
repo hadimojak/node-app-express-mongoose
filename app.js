@@ -1,5 +1,6 @@
 const path = require("path");
-
+const https = require("https");
+const fs = require("fs");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -7,12 +8,14 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
-
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
-
-const MONGODB_URI =
-  "mongodb+srv://mojak:0015166031@nodejs-store.tbcbg.mongodb.net/shop?retryWrites=true&w=majority";
+const privateKey = "";
+const certificate = "";
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@nodejs-store.tbcbg.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`;
 
 const app = express();
 const csrfProtection = csrf();
@@ -45,6 +48,12 @@ app.set("views", "views");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
+const accessLogStram = fs.createWriteStream(path.join(__dirname, "acces.log"), {
+  flags: "a",
+});
+app.use(helmet());
+app.use(compression());
+app.use(morgan("combined", { stream: accessLogStram }));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -119,7 +128,10 @@ mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     console.log("connected");
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
+    // https     // using ssl ecription
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    //   .listen(process.env.PORT || 3000);
   })
   .catch((err) => {
     console.log(err);
