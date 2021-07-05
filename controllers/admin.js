@@ -36,7 +36,9 @@ exports.postAddProduct = (req, res, next) => {
     });
   }
   const errors = validationResult(req);
-  const imageUrl = image.path;
+  const imageUrl = "images/" + image.path.split("\\")[1];
+  // const imageUrl = image.path;
+  console.log(imageUrl);
 
   if (!errors.isEmpty()) {
     console.log(errors.array());
@@ -157,7 +159,7 @@ exports.postEditProduct = (req, res, next) => {
       product.description = updatedDesc;
       if (image) {
         fileHelper.deleteFile(product.imageUrl);
-        product.imageUrl = image.path;
+        product.imageUrl = "images/" + image.path.split("\\")[1];
       }
       return product.save().then((result) => {
         console.log("UPDATED PRODUCT!");

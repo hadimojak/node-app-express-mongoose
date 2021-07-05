@@ -12,6 +12,8 @@ const helmet = require("helmet");
 const compression = require("compression");
 const morgan = require("morgan");
 const errorController = require("./controllers/error");
+const isAuth = require("./middleware/is-auth");
+
 const User = require("./models/user");
 const privateKey = "";
 const certificate = "";
@@ -61,6 +63,7 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
+
 app.use(
   session({
     secret: "my secret",
@@ -77,12 +80,14 @@ app.use(csrfProtection);
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
+  console.log("auth " + req.session.isLoggedIn);
   res.locals.csrfToken = req.csrfToken();
   if (!req.session.user) {
     res.locals.isAdmin = false;
     return next();
   }
   res.locals.isAdmin = req.session.user.isAdmin;
+  console.log("admin " + req.session.user.isAdmin);
   next();
 });
 
