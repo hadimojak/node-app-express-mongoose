@@ -5,14 +5,14 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production MONGO_USER=mojak MONGO_PASSWORD=0015166031 MONGO_DEFAULT_DATABASE=shop ZARINPAL_KEY=6TKMCOWP-UNHN-IOWR-HPL8HPL8-HBMFOLRVLKBP node app.js",
+    "start": "cross-env NODE_ENV=production MONGO_USER=mojak MONGO_PASSWORD=0015166031 MONGO_DEFAULT_DATABASE=shop ZARINPAL_KEY=6TKMCOWP-UNHN-IOWR-HPL8-HBMFOLRVLKBP node app.js",
     "start-server": "node app.js",
     "start:dev": "nodemon add.js"
   },
   "author": "hadi arbabi",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^1.18.3"
+    "nodemon": "^2.0.9"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

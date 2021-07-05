@@ -8,7 +8,10 @@ const ITEMS_PER_PAGE = 2;
 //   "pk_test_51J1U1pGOC6u4RDJJJCB4dvvGQAwbsyXjs2Ejy97INeG2xDkxXlIlrD3lUvD9lq12LrQxxRpjdrh5gY4TF0arrWUr00ZCvCuABI"
 // );
 const ZarinpalCheckout = require("zarinpal-checkout");
-const zarinpal = ZarinpalCheckout.create(process.env.ZARINPAL_KEY, true);
+const zarinpal = ZarinpalCheckout.create(
+  "6TKMCOWP-UNHN-IOWR-HPL8-HBMFOLRVLKBP",
+  true
+);
 
 exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
